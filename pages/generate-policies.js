@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function GeneratePolicies() {
-  const [error, setError] = useState(null);
   const [templates, setTemplates] = useState([]);
   const [selectedTemplates, setSelectedTemplates] = useState([]);
   const [commonFields, setCommonFields] = useState({
@@ -15,24 +14,27 @@ export default function GeneratePolicies() {
     owner_name: '',
     entity_defined_contact_info: '',
   });
+  const [generatedPolicies, setGeneratedPolicies] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchTemplates = async () => {
-      try {
-        const res = await fetch('/api/templates');
-        const data = await res.json();
-        if (data.success) {
-          setTemplates(data.data);
-        } else {
-          console.error('Failed to fetch templates:', data.message);
-        }
-      } catch (error) {
-        console.error('Error fetching templates:', error);
-      }
-    };
-
     fetchTemplates();
   }, []);
+
+  const fetchTemplates = async () => {
+    try {
+      const res = await fetch('/api/templates');
+      const data = await res.json();
+      if (data.success) {
+        setTemplates(data.data);
+      } else {
+        throw new Error(data.message || 'Failed to fetch templates');
+      }
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      setError('Failed to fetch templates. Please try again.');
+    }
+  };
 
   const handleCommonFieldChange = (e) => {
     const { name, value } = e.target;
@@ -50,6 +52,8 @@ export default function GeneratePolicies() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+    setGeneratedPolicies([]);
     try {
       const response = await fetch('/api/generate-policies', {
         method: 'POST',
@@ -63,20 +67,29 @@ export default function GeneratePolicies() {
       
       const data = await response.json();
       if (data.success) {
+        setGeneratedPolicies(data.policies);
         alert('Policies generated successfully!');
       } else {
         throw new Error(data.message || 'Failed to generate policies');
       }
     } catch (error) {
       console.error('Error generating policies:', error);
-      alert('Failed to generate policies. Please try again.');
+      setError('Failed to generate policies. Please try again.');
     }
   };
-  
+
+  const downloadPolicy = (policy) => {
+    const element = document.createElement("a");
+    const file = new Blob([policy.content], {type: 'text/plain'});
+    element.href = URL.createObjectURL(file);
+    element.download = `${policy.name}.txt`;
+    document.body.appendChild(element);
+    element.click();
+  };
+
   return (
     <div>
       <h1>Generate Policies</h1>
-      <Link href="/">Back to Home</Link>
       <form onSubmit={handleSubmit}>
         <h2>Common Fields</h2>
         {Object.entries(commonFields).map(([name, value]) => (
@@ -106,6 +119,18 @@ export default function GeneratePolicies() {
         <button type="submit">Generate Selected Policies</button>
       </form>
       {error && <div className="error">{error}</div>}
+      {generatedPolicies.length > 0 && (
+        <div>
+          <h2>Generated Policies</h2>
+          <ul>
+            {generatedPolicies.map((policy, index) => (
+              <li key={index}>
+                {policy.name} <button onClick={() => downloadPolicy(policy)}>Download</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
