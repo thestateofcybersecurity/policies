@@ -1,5 +1,5 @@
-import { connectToDatabase } from '../../../utils/mongodb';
-import PolicyTemplate from '../../../models/PolicyTemplate';
+import { connectToDatabase } from '../../utils/mongodb';
+import PolicyTemplate from '../../models/PolicyTemplate';
 
 export default async function handler(req, res) {
   console.log('Received request:', req.method, req.url);
