@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function GeneratePolicies() {
+  const [error, setError] = useState(null);
   const [templates, setTemplates] = useState([]);
   const [selectedTemplates, setSelectedTemplates] = useState([]);
   const [commonFields, setCommonFields] = useState({
@@ -104,6 +105,7 @@ export default function GeneratePolicies() {
         ))}
         <button type="submit">Generate Selected Policies</button>
       </form>
+      {error && <div className="error">{error}</div>}
     </div>
   );
 }
