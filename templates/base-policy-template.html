@@ -1,0 +1,104 @@
+// templates/base-policy-template.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{policy_title}}</title>
+    <style>
+        /* Include the content of policy-styles.css here */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: #2c3e50;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+
+        h1 {
+            font-size: 24px;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 20px;
+        }
+
+        h3 {
+            font-size: 18px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 1em;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        ul, ol {
+            margin-bottom: 1em;
+        }
+
+        .policy-header {
+            text-align: center;
+            margin-bottom: 2em;
+        }
+
+        .policy-footer {
+            margin-top: 2em;
+            border-top: 1px solid #ddd;
+            padding-top: 1em;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="policy-header">
+        <h1>{{policy_title}}</h1>
+        <p><strong>Policy Number:</strong> {{policy_number}}</p>
+        <p><strong>Effective Date:</strong> {{effective_date}}</p>
+        <p><strong>Last Updated:</strong> {{updated_date}}</p>
+    </div>
+
+    <h2>1.0 Purpose and Benefits</h2>
+    <p>{{purpose_and_benefits}}</p>
+
+    <h2>2.0 Scope</h2>
+    <p>{{scope}}</p>
+
+    <h2>3.0 Policy</h2>
+    {{policy_content}}
+
+    <h2>4.0 Compliance</h2>
+    <p>{{compliance_statement}}</p>
+
+    <h2>5.0 Definitions of Key Terms</h2>
+    {{definitions}}
+
+    <div class="policy-footer">
+        <p><strong>Issued By:</strong> {{issuer_name}}</p>
+        <p><strong>Owner:</strong> {{owner_name}}</p>
+        <p><strong>Contact Information:</strong> {{entity_defined_contact_info}}</p>
+    </div>
+</body>
+</html>
