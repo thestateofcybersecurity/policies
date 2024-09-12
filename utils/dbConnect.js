@@ -18,7 +18,15 @@ async function dbConnect() {
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI).then((mongoose) => {
+    const opts = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 20000, // Increase timeout to 20 seconds
+      socketTimeoutMS: 45000, // Increase socket timeout to 45 seconds
+    };
+
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
       return mongoose;
     });
   }
