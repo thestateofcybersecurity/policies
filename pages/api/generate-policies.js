@@ -1,7 +1,6 @@
 // pages/api/generate-policies.js
 import { connectToDatabase } from '../../utils/mongodb';
-import chromium from 'chrome-aws-lambda';
-import puppeteer from 'puppeteer-core';
+import { ObjectId } from 'mongodb';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
@@ -9,47 +8,41 @@ export default async function handler(req, res) {
       const { db } = await connectToDatabase();
       const { templateIds, commonFields } = req.body;
 
-      const templates = await db.collection('templates').find({ _id: { $in: templateIds } }).toArray();
+      const objectIds = templateIds.map(id => new ObjectId(id));
+      const templates = await db.collection('templates').find({ _id: { $in: objectIds } }).toArray();
 
-      const browser = await puppeteer.launch(chromium.executablePath ? {
-        args: chromium.args,
-        executablePath: await chromium.executablePath,
-        headless: chromium.headless,
-      } : {});
+      if (templates.length === 0) {
+        return res.status(404).json({ success: false, message: 'No templates found' });
+      }
 
-      const generatedPolicies = await Promise.all(templates.map(async (template) => {
+      const generatedPolicies = templates.map((template) => {
         let content = template.content;
         
         // Replace common fields
         Object.entries(commonFields).forEach(([key, value]) => {
-          content = content.replace(new RegExp(`{{${key}}}`, 'g'), value);
+          content = content.replace(new RegExp(`{{${key}}}`, 'g'), value || '');
         });
 
         const policyNumber = generatePolicyNumber();
         const effectiveDate = new Date().toISOString().split('T')[0];
         
         // Generate unique fields
-        content = content.replace(/{{policy_number}}/g, generatePolicyNumber());
-        content = content.replace(/{{effective_date}}/g, new Date().toISOString().split('T')[0]);
-        content = content.replace(/{{date_issued}}/g, new Date().toISOString().split('T')[0]);
-        content = content.replace(/{{date_reviewed}}/g, new Date().toISOString().split('T')[0]);
-        content = content.replace(/{{updated_date}}/g, new Date().toISOString().split('T')[0]);
-
-        const page = await browser.newPage();
-        await page.setContent(content, { waitUntil: 'networkidle0' });
-        const pdf = await page.pdf({ format: 'A4', printBackground: true });
-        await page.close();
+        content = content.replace(/{{policy_number}}/g, policyNumber);
+        content = content.replace(/{{effective_date}}/g, effectiveDate);
+        content = content.replace(/{{date_issued}}/g, effectiveDate);
+        content = content.replace(/{{date_reviewed}}/g, effectiveDate);
+        content = content.replace(/{{updated_date}}/g, effectiveDate);
 
         return {
           name: template.name,
-          pdf: pdf.toString('base64'),
           content: content,
         };
-      }));
+      });
 
-      await browser.close();
+      // Here you would typically save the generated policies or prepare them for download
+      // For this example, we'll just send a success message
 
-      res.status(200).json({ success: true, message: 'Policies generated successfully' });
+      res.status(200).json({ success: true, message: 'Policies generated successfully', policies: generatedPolicies });
     } catch (error) {
       console.error('Error in generate-policies:', error);
       res.status(500).json({ success: false, message: 'Internal server error' });
