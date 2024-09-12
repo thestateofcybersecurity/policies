@@ -19,6 +19,10 @@ export default async function handler(req, res) {
       const { db } = await connectToDatabase();
       const { templateIds, commonFields } = req.body;
 
+      if (!templateIds || !Array.isArray(templateIds) || templateIds.length === 0) {
+        return res.status(400).json({ success: false, message: 'Invalid or missing templateIds' });
+      }
+
       const objectIds = templateIds.map(id => new ObjectId(id));
       const templates = await db.collection('templates').find({ _id: { $in: objectIds } }).toArray();
 
