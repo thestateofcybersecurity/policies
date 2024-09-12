@@ -1,6 +1,6 @@
 // pages/api/generate-policies.js
 import { ObjectId } from 'mongodb';
-import { connectToDatabase } from '../../utils/mongodb';
+import { connectToDatabase } from '../utils/mongodb';
 import chromium from 'chrome-aws-lambda';
 import puppeteer from 'puppeteer-core';
 
