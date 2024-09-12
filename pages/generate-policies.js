@@ -79,12 +79,27 @@ export default function GeneratePolicies() {
   };
 
   const downloadPolicy = (policy) => {
-    const element = document.createElement("a");
-    const file = new Blob([policy.content], {type: 'text/plain'});
-    element.href = URL.createObjectURL(file);
-    element.download = `${policy.name}.txt`;
-    document.body.appendChild(element);
-    element.click();
+    // Decode the base64 string
+    const binaryString = atob(policy.content);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    // Create Blob with the binary data
+    const blob = new Blob([bytes], {
+      type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    });
+
+    // Create a link element, set the download attribute with a .docx extension
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${policy.name}.docx`;
+
+    // Append to the document, click and remove it
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -125,7 +140,7 @@ export default function GeneratePolicies() {
           <ul>
             {generatedPolicies.map((policy, index) => (
               <li key={index}>
-                {policy.name} <button onClick={() => downloadPolicy(policy)}>Download</button>
+                {policy.name} <button onClick={() => downloadPolicy(policy)}>Download DOCX</button>
               </li>
             ))}
           </ul>
