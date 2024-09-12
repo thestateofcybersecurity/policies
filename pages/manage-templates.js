@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export default function ManageTemplates() {
   const [templates, setTemplates] = useState([]);
-  const [newTemplate, setNewTemplate] = useState({ name: '', content: '' });
+  const [newTemplate, setNewTemplate] = useState({ name: '', content: '', type: 'html' });
   const [editingTemplate, setEditingTemplate] = useState(null);
 
   useEffect(() => {
@@ -78,11 +78,19 @@ export default function ManageTemplates() {
           placeholder="Template Name"
           required
         />
+        <select
+          name="type"
+          value={editingTemplate ? editingTemplate.type : newTemplate.type}
+          onChange={handleInputChange}
+        >
+          <option value="html">HTML</option>
+          <option value="text">Plain Text</option>
+        </select>
         <textarea
           name="content"
           value={editingTemplate ? editingTemplate.content : newTemplate.content}
           onChange={handleInputChange}
-          placeholder="Template Content"
+          placeholder="Template Content (HTML or Plain Text)"
           required
         />
         <button type="submit">{editingTemplate ? 'Update Template' : 'Create Template'}</button>
