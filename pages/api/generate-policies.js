@@ -3,6 +3,17 @@ import { connectToDatabase } from '../../utils/mongodb';
 import { ObjectId } from 'mongodb';
 
 export default async function handler(req, res) {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   if (req.method === 'POST') {
     try {
       const { db } = await connectToDatabase();
@@ -38,9 +49,6 @@ export default async function handler(req, res) {
           content: content,
         };
       });
-
-      // Here you would typically save the generated policies or prepare them for download
-      // For this example, we'll just send a success message
 
       res.status(200).json({ success: true, message: 'Policies generated successfully', policies: generatedPolicies });
     } catch (error) {
