@@ -16,6 +16,8 @@ export default function GeneratePolicies() {
   });
   const [generatedPolicies, setGeneratedPolicies] = useState([]);
   const [error, setError] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     fetchTemplates();
@@ -144,6 +146,12 @@ export default function GeneratePolicies() {
               </li>
             ))}
           </ul>
+        </div>
+      )}
+      {isGenerating && (
+        <div>
+          <progress value={progress} max={100}></progress>
+          <p>{progress}% complete</p>
         </div>
       )}
     </div>
