@@ -1,31 +1,21 @@
-// pages/api/generate-policies.js
-import { connectToDatabase } from '../../utils/mongodb';
-import { ObjectId } from 'mongodb';
+import { connectToDatabase } from '../../../utils/mongodb';
+import PolicyTemplate from '../../../models/PolicyTemplate';
 
 export default async function handler(req, res) {
   console.log('Received request:', req.method, req.url);
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
-
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-
+  
   if (req.method === 'POST') {
     try {
       const { db } = await connectToDatabase();
       console.log('Connected to database');
-
+      
+      const { templateIds, commonFields } = req.body;
+      
       if (!templateIds || !Array.isArray(templateIds) || templateIds.length === 0) {
         return res.status(400).json({ success: false, message: 'Invalid or missing templateIds' });
       }
 
-      const objectIds = templateIds.map(id => new ObjectId(id));
-      const templates = await db.collection('templates').find({ _id: { $in: objectIds } }).toArray();
+      const templates = await PolicyTemplate.find({ _id: { $in: templateIds } });
 
       if (templates.length === 0) {
         return res.status(404).json({ success: false, message: 'No templates found' });
@@ -56,7 +46,7 @@ export default async function handler(req, res) {
       });
 
       console.log('Policies generated successfully');
-      res.status(200).json({ success: true, message: 'Policies generated successfully' });
+      res.status(200).json({ success: true, message: 'Policies generated successfully', policies: generatedPolicies });
     } catch (error) {
       console.error('Error generating policies:', error);
       res.status(500).json({ success: false, message: 'Internal server error' });
