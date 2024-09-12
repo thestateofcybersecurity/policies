@@ -49,11 +49,11 @@ export default function GeneratePolicies() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          templateIds: selectedTemplates,
-          commonFields,
-        }),
+        body: JSON.stringify(data),
       });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
       if (data.success) {
         data.policies.forEach(policy => {
