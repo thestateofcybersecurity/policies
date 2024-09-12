@@ -3,6 +3,7 @@ import { connectToDatabase } from '../../utils/mongodb';
 import { ObjectId } from 'mongodb';
 
 export default async function handler(req, res) {
+  console.log('Received request:', req.method, req.url);
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -17,7 +18,7 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
       const { db } = await connectToDatabase();
-      const { templateIds, commonFields } = req.body;
+      console.log('Connected to database');
 
       if (!templateIds || !Array.isArray(templateIds) || templateIds.length === 0) {
         return res.status(400).json({ success: false, message: 'Invalid or missing templateIds' });
@@ -54,12 +55,14 @@ export default async function handler(req, res) {
         };
       });
 
-      res.status(200).json({ success: true, message: 'Policies generated successfully', policies: generatedPolicies });
+      console.log('Policies generated successfully');
+      res.status(200).json({ success: true, message: 'Policies generated successfully' });
     } catch (error) {
-      console.error('Error in generate-policies:', error);
+      console.error('Error generating policies:', error);
       res.status(500).json({ success: false, message: 'Internal server error' });
     }
   } else {
+    console.log('Method not allowed');
     res.status(405).json({ success: false, message: 'Method not allowed' });
   }
 }
