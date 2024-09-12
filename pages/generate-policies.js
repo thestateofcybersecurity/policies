@@ -16,16 +16,21 @@ export default function GeneratePolicies() {
   });
 
   useEffect(() => {
-    fetch('/api/templates')
-      .then(res => res.json())
-      .then(data => {
+    const fetchTemplates = async () => {
+      try {
+        const res = await fetch('/api/templates');
+        const data = await res.json();
         if (data.success) {
           setTemplates(data.data);
         } else {
           console.error('Failed to fetch templates:', data.message);
         }
-      })
-      .catch(error => console.error('Error fetching templates:', error));
+      } catch (error) {
+        console.error('Error fetching templates:', error);
+      }
+    };
+
+    fetchTemplates();
   }, []);
 
   const handleCommonFieldChange = (e) => {
@@ -70,7 +75,7 @@ export default function GeneratePolicies() {
   return (
     <div>
       <h1>Generate Policies</h1>
-      <Link href="/"><a>Back to Home</a></Link>
+      <Link href="/">Back to Home</Link>
       <form onSubmit={handleSubmit}>
         <h2>Common Fields</h2>
         {Object.entries(commonFields).map(([name, value]) => (
