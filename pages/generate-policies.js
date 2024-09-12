@@ -16,22 +16,21 @@ export default function GeneratePolicies() {
   });
 
   useEffect(() => {
+    async function fetchTemplates() {
+      try {
+        const res = await fetch('/api/templates');
+        const data = await res.json();
+        if (data.success) {
+          setTemplates(data.data);
+        } else {
+          console.error('Failed to fetch templates:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching templates:', error);
+      }
+    }
     fetchTemplates();
   }, []);
-
-  const fetchTemplates = async () => {
-    try {
-      const res = await fetch('/api/templates');
-      const data = await res.json();
-      if (data.success) {
-        setTemplates(data.data);
-      } else {
-        console.error('Failed to fetch templates:', data.message);
-      }
-    } catch (error) {
-      console.error('Error fetching templates:', error);
-    }
-  };
 
   const handleCommonFieldChange = (e) => {
     const { name, value } = e.target;
@@ -65,34 +64,15 @@ export default function GeneratePolicies() {
       }
       const data = await response.json();
       if (data.success) {
-        data.policies.forEach(policy => {
-          const pdfBlob = base64ToBlob(policy.pdf, 'application/pdf');
-          const url = URL.createObjectURL(pdfBlob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `${policy.name}.pdf`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        });
+        alert('Policies generated successfully!');
+        // Handle successful policy generation (e.g., show download links)
       } else {
         throw new Error(data.message || 'Failed to generate policies');
       }
     } catch (error) {
       console.error('Error generating policies:', error);
-      // You might want to add some user-facing error handling here
+      alert('Failed to generate policies. Please try again.');
     }
-  };
-
-  const base64ToBlob = (base64, type = 'application/octet-stream') => {
-    const binStr = atob(base64);
-    const len = binStr.length;
-    const arr = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      arr[i] = binStr.charCodeAt(i);
-    }
-    return new Blob([arr], { type: type });
   };
   
   return (
