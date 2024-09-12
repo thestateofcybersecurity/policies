@@ -1,6 +1,6 @@
 // pages/generate-policies.js
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
 export default function GeneratePolicies() {
   const [templates, setTemplates] = useState([]);
@@ -20,25 +20,49 @@ export default function GeneratePolicies() {
   }, []);
 
   const fetchTemplates = async () => {
-    const res = await fetch('/api/templates');
-    const data = await res.json();
-    if (data.success) {
-      setTemplates(data.data);
+    try {
+      const res = await fetch('/api/templates');
+      const data = await res.json();
+      if (data.success) {
+        setTemplates(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching templates:', error);
     }
   };
 
   const handleCommonFieldChange = (e) => {
     const { name, value } = e.target;
-    setCommonFields({ ...commonFields, [name]: value });
+    setCommonFields(prev => ({ ...prev, [name]: value }));
   };
 
   const handleTemplateSelection = (e) => {
     const templateId = e.target.value;
-    if (e.target.checked) {
-      setSelectedTemplates([...selectedTemplates, templateId]);
-    } else {
-      setSelectedTemplates(selectedTemplates.filter(id => id !== templateId));
-    }
+    setSelectedTemplates(prev => 
+      e.target.checked
+        ? [...prev, templateId]
+        : prev.filter(id => id !== templateId)
+    );
+  };
+
+  const generatePDF = async (policyData) => {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage();
+    const { width, height } = page.getSize();
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+    page.drawText(policyData.title, {
+      x: 50,
+      y: height - 50,
+      size: 20,
+      font: font,
+      color: rgb(0, 0, 0),
+    });
+
+    // Add more content to the PDF here...
+
+    const pdfBytes = await pdfDoc.save();
+    return pdfBytes;
   };
 
   const handleSubmit = async (e) => {
@@ -49,16 +73,34 @@ export default function GeneratePolicies() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          templateIds: selectedTemplates,
+          commonFields,
+        }),
       });
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+
       const data = await response.json();
+      
       if (data.success) {
-        data.policies.forEach(policy => {
-          const pdfBlob = base64ToBlob(policy.pdf, 'application/pdf');
-          const url = URL.createObjectURL(pdfBlob);
+        // Generate PDFs on the client side
+        const generatedPolicies = await Promise.all(
+          data.policies.map(async (policy) => {
+            const pdfBytes = await generatePDF(policy);
+            return {
+              name: policy.name,
+              pdf: pdfBytes,
+            };
+          })
+        );
+
+        // Trigger downloads
+        generatedPolicies.forEach(policy => {
+          const blob = new Blob([policy.pdf], { type: 'application/pdf' });
+          const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
           a.download = `${policy.name}.pdf`;
@@ -67,28 +109,18 @@ export default function GeneratePolicies() {
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
         });
+      } else {
+        throw new Error(data.message || 'Failed to generate policies');
       }
     } catch (error) {
       console.error('Error generating policies:', error);
+      // Handle error (e.g., show error message to user)
     }
   };
 
-  const base64ToBlob = (base64, type = 'application/octet-stream') => {
-    const binStr = atob(base64);
-    const len = binStr.length;
-    const arr = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      arr[i] = binStr.charCodeAt(i);
-    }
-    return new Blob([arr], { type: type });
-  };
-  
   return (
     <div>
       <h1>Generate Policies</h1>
-      <Link href="/">
-        <a>Back to Home</a>
-      </Link>
       <form onSubmit={handleSubmit}>
         <h2>Common Fields</h2>
         {Object.entries(commonFields).map(([name, value]) => (
