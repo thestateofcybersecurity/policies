@@ -16,33 +16,29 @@ export default function GeneratePolicies() {
   });
 
   useEffect(() => {
-    async function fetchTemplates() {
-      try {
-        const res = await fetch('/api/templates');
-        const data = await res.json();
+    fetch('/api/templates')
+      .then(res => res.json())
+      .then(data => {
         if (data.success) {
           setTemplates(data.data);
         } else {
           console.error('Failed to fetch templates:', data.message);
         }
-      } catch (error) {
-        console.error('Error fetching templates:', error);
-      }
-    }
-    fetchTemplates();
+      })
+      .catch(error => console.error('Error fetching templates:', error));
   }, []);
 
   const handleCommonFieldChange = (e) => {
     const { name, value } = e.target;
-    setCommonFields(prevFields => ({ ...prevFields, [name]: value }));
+    setCommonFields(prev => ({ ...prev, [name]: value }));
   };
 
   const handleTemplateSelection = (e) => {
     const templateId = e.target.value;
-    setSelectedTemplates(prevSelected => 
+    setSelectedTemplates(prev => 
       e.target.checked
-        ? [...prevSelected, templateId]
-        : prevSelected.filter(id => id !== templateId)
+        ? [...prev, templateId]
+        : prev.filter(id => id !== templateId)
     );
   };
 
@@ -51,21 +47,17 @@ export default function GeneratePolicies() {
     try {
       const response = await fetch('/api/generate-policies', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          templateIds: selectedTemplates,
-          commonFields,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ templateIds: selectedTemplates, commonFields }),
       });
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
       const data = await response.json();
       if (data.success) {
         alert('Policies generated successfully!');
-        // Handle successful policy generation (e.g., show download links)
       } else {
         throw new Error(data.message || 'Failed to generate policies');
       }
@@ -78,9 +70,7 @@ export default function GeneratePolicies() {
   return (
     <div>
       <h1>Generate Policies</h1>
-      <Link href="/">
-        <a>Back to Home</a>
-      </Link>
+      <Link href="/"><a>Back to Home</a></Link>
       <form onSubmit={handleSubmit}>
         <h2>Common Fields</h2>
         {Object.entries(commonFields).map(([name, value]) => (
