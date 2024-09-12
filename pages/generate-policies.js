@@ -55,13 +55,34 @@ export default function GeneratePolicies() {
         }),
       });
       const data = await response.json();
-      // Handle the response, e.g., provide download links for generated policies
-      console.log(data);
+      if (data.success) {
+        data.policies.forEach(policy => {
+          const pdfBlob = base64ToBlob(policy.pdf, 'application/pdf');
+          const url = URL.createObjectURL(pdfBlob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${policy.name}.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        });
+      }
     } catch (error) {
       console.error('Error generating policies:', error);
     }
   };
 
+  const base64ToBlob = (base64, type = 'application/octet-stream') => {
+    const binStr = atob(base64);
+    const len = binStr.length;
+    const arr = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      arr[i] = binStr.charCodeAt(i);
+    }
+    return new Blob([arr], { type: type });
+  };
+  
   return (
     <div>
       <h1>Generate Policies</h1>
