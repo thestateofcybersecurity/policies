@@ -1,5 +1,7 @@
 // pages/api/generate-policies.js
 import { connectToDatabase } from '../../utils/mongodb';
+import chromium from 'chrome-aws-lambda';
+import puppeteer from 'puppeteer-core';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
@@ -9,7 +11,13 @@ export default async function handler(req, res) {
 
       const templates = await db.collection('templates').find({ _id: { $in: templateIds } }).toArray();
 
-      const generatedPolicies = templates.map(template => {
+      const browser = await puppeteer.launch(chromium.executablePath ? {
+        args: chromium.args,
+        executablePath: await chromium.executablePath,
+        headless: chromium.headless,
+      } : {});
+
+      const generatedPolicies = await Promise.all(templates.map(async (template) => {
         let content = template.content;
         
         // Replace common fields
@@ -24,14 +32,18 @@ export default async function handler(req, res) {
         content = content.replace(/{{date_reviewed}}/g, new Date().toISOString().split('T')[0]);
         content = content.replace(/{{updated_date}}/g, new Date().toISOString().split('T')[0]);
 
+        const page = await browser.newPage();
+        await page.setContent(content, { waitUntil: 'networkidle0' });
+        const pdf = await page.pdf({ format: 'A4', printBackground: true });
+        await page.close();
+
         return {
           name: template.name,
-          content: content,
+          pdf: pdf.toString('base64'),
         };
-      });
+      }));
 
-      // Here you would typically save the generated policies or prepare them for download
-      // For this example, we'll just send them back in the response
+      await browser.close();
 
       res.status(200).json({ success: true, policies: generatedPolicies });
     } catch (error) {
@@ -44,6 +56,5 @@ export default async function handler(req, res) {
 }
 
 function generatePolicyNumber() {
-  // Implement your policy number generation logic here
   return 'POL-' + Math.random().toString(36).substr(2, 9).toUpperCase();
 }
