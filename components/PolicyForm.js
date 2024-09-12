@@ -1,7 +1,8 @@
-// components/PolicyForm.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function PolicyForm() {
+  const [templates, setTemplates] = useState([]);
+  const [selectedTemplate, setSelectedTemplate] = useState('');
   const [policyData, setPolicyData] = useState({
     policyName: '',
     entityName: '',
@@ -10,9 +11,25 @@ export default function PolicyForm() {
     customField2: '',
   });
 
+  useEffect(() => {
+    fetchTemplates();
+  }, []);
+
+  const fetchTemplates = async () => {
+    const res = await fetch('/api/templates');
+    const data = await res.json();
+    if (data.success) {
+      setTemplates(data.data);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setPolicyData({ ...policyData, [name]: value });
+  };
+
+  const handleTemplateChange = (e) => {
+    setSelectedTemplate(e.target.value);
   };
 
   const handleSubmit = async (e) => {
@@ -23,7 +40,7 @@ export default function PolicyForm() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(policyData),
+        body: JSON.stringify({ ...policyData, templateId: selectedTemplate }),
       });
       const data = await response.json();
       console.log(data);
@@ -35,6 +52,17 @@ export default function PolicyForm() {
 
   return (
     <form onSubmit={handleSubmit}>
+      <div>
+        <label>Select Template:</label>
+        <select value={selectedTemplate} onChange={handleTemplateChange}>
+          <option value="">Select a template</option>
+          {templates.map((template) => (
+            <option key={template._id} value={template._id}>
+              {template.name}
+            </option>
+          ))}
+        </select>
+      </div>
       <div>
         <label>Policy Name:</label>
         <input
