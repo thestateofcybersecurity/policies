@@ -25,6 +25,9 @@ export default async function handler(req, res) {
           content = content.replace(new RegExp(`{{${key}}}`, 'g'), value);
         });
 
+        const policyNumber = generatePolicyNumber();
+        const effectiveDate = new Date().toISOString().split('T')[0];
+        
         // Generate unique fields
         content = content.replace(/{{policy_number}}/g, generatePolicyNumber());
         content = content.replace(/{{effective_date}}/g, new Date().toISOString().split('T')[0]);
@@ -40,6 +43,7 @@ export default async function handler(req, res) {
         return {
           name: template.name,
           pdf: pdf.toString('base64'),
+          content: content,
         };
       }));
 
