@@ -1,6 +1,6 @@
 import { connectToDatabase } from '../../utils/mongodb';
 import PolicyTemplate from '../../models/PolicyTemplate';
-import { Document, Packer, Paragraph, TextRun } from 'docx';
+import HTMLtoDOCX from 'html-to-docx';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
@@ -37,24 +37,16 @@ export default async function handler(req, res) {
         content = content.replace(/{{date_reviewed}}/g, effectiveDate);
         content = content.replace(/{{updated_date}}/g, effectiveDate);
 
-        // Create docx document
-        const doc = new Document({
-          sections: [{
-            properties: {},
-            children: [
-              new Paragraph({
-                children: [new TextRun(content)],
-              }),
-            ],
-          }],
+        // Convert HTML to DOCX
+        const docxBuffer = await HTMLtoDOCX(content, null, {
+          table: { row: { cantSplit: true } },
+          footer: true,
+          pageNumber: true,
         });
-
-        // Generate buffer
-        const buffer = await Packer.toBuffer(doc);
 
         return {
           name: template.name,
-          content: buffer.toString('base64'),
+          content: docxBuffer.toString('base64'),
         };
       }));
 
