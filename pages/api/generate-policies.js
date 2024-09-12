@@ -2,6 +2,15 @@ import { connectToDatabase } from '../../utils/mongodb';
 import PolicyTemplate from '../../models/PolicyTemplate';
 import HTMLtoDOCX from 'html-to-docx';
 
+export const config = {
+  api: {
+    responseLimit: false,
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
+};
+
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
@@ -19,36 +28,44 @@ export default async function handler(req, res) {
         return res.status(404).json({ success: false, message: 'No templates found' });
       }
 
-      const generatedPolicies = await Promise.all(templates.map(async (template) => {
-        let content = template.content;
-        
-        // Replace common fields
-        Object.entries(commonFields).forEach(([key, value]) => {
-          content = content.replace(new RegExp(`{{${key}}}`, 'g'), value || '');
-        });
+      const batchSize = 5; // Adjust this based on your needs
+      const generatedPolicies = [];
 
-        const policyNumber = generatePolicyNumber();
-        const effectiveDate = new Date().toISOString().split('T')[0];
-        
-        // Generate unique fields
-        content = content.replace(/{{policy_number}}/g, policyNumber);
-        content = content.replace(/{{effective_date}}/g, effectiveDate);
-        content = content.replace(/{{date_issued}}/g, effectiveDate);
-        content = content.replace(/{{date_reviewed}}/g, effectiveDate);
-        content = content.replace(/{{updated_date}}/g, effectiveDate);
+      for (let i = 0; i < templates.length; i += batchSize) {
+        const batch = templates.slice(i, i + batchSize);
+        const batchResults = await Promise.all(batch.map(async (template) => {
+          let content = template.content;
+          
+          // Replace common fields
+          Object.entries(commonFields).forEach(([key, value]) => {
+            content = content.replace(new RegExp(`{{${key}}}`, 'g'), value || '');
+          });
 
-        // Convert HTML to DOCX
-        const docxBuffer = await HTMLtoDOCX(content, null, {
-          table: { row: { cantSplit: true } },
-          footer: true,
-          pageNumber: true,
-        });
+          const policyNumber = generatePolicyNumber();
+          const effectiveDate = new Date().toISOString().split('T')[0];
+          
+          // Generate unique fields
+          content = content.replace(/{{policy_number}}/g, policyNumber);
+          content = content.replace(/{{effective_date}}/g, effectiveDate);
+          content = content.replace(/{{date_issued}}/g, effectiveDate);
+          content = content.replace(/{{date_reviewed}}/g, effectiveDate);
+          content = content.replace(/{{updated_date}}/g, effectiveDate);
 
-        return {
-          name: template.name,
-          content: docxBuffer.toString('base64'),
-        };
-      }));
+          // Convert HTML to DOCX
+          const docxBuffer = await HTMLtoDOCX(content, null, {
+            table: { row: { cantSplit: true } },
+            footer: true,
+            pageNumber: true,
+          });
+
+          return {
+            name: template.name,
+            content: docxBuffer.toString('base64'),
+          };
+        }));
+
+        generatedPolicies.push(...batchResults);
+      }
 
       res.status(200).json({ success: true, message: 'Policies generated successfully', policies: generatedPolicies });
     } catch (error) {
