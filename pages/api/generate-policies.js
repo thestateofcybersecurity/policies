@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   
   if (req.method === 'POST') {
     try {
-      const { db } = await connectToDatabase();
+      await connectToDatabase();
       console.log('Connected to database');
       
       const { templateIds, commonFields } = req.body;
@@ -45,7 +45,7 @@ export default async function handler(req, res) {
         };
       });
 
-      console.log('Policies generated successfully');
+      console.log('Policies generated successfully:', generatedPolicies);
       res.status(200).json({ success: true, message: 'Policies generated successfully', policies: generatedPolicies });
     } catch (error) {
       console.error('Error generating policies:', error);
