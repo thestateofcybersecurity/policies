@@ -1,134 +1,78 @@
-// pages/generate-policies.js
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+// pages/api/generate-policies.js
+import { ObjectId } from 'mongodb';
+import { connectToDatabase } from '../../utils/mongodb';
+import chromium from 'chrome-aws-lambda';
+import puppeteer from 'puppeteer-core';
 
-export default function GeneratePolicies() {
-  const [templates, setTemplates] = useState([]);
-  const [selectedTemplates, setSelectedTemplates] = useState([]);
-  const [commonFields, setCommonFields] = useState({
-    entity_name: '',
-    CISO_equivalent_title: '',
-    CIO_equivalent_title: '',
-    responsible_department_name: '',
-    issuer_name: '',
-    owner_name: '',
-    entity_defined_contact_info: '',
-  });
-
-  useEffect(() => {
-    fetchTemplates();
-  }, []);
-
-  const fetchTemplates = async () => {
+export default async function handler(req, res) {
+  if (req.method === 'POST') {
     try {
-      const res = await fetch('/api/templates');
-      const data = await res.json();
-      if (data.success) {
-        setTemplates(data.data);
-      } else {
-        console.error('Failed to fetch templates:', data.message);
+      const { db } = await connectToDatabase();
+      const { templateIds, commonFields } = req.body;
+
+      // Convert string IDs to ObjectId
+      const objectIds = templateIds.map(id => new ObjectId(id));
+
+      const templates = await db.collection('templates').find({ _id: { $in: objectIds } }).toArray();
+
+      if (templates.length === 0) {
+        return res.status(404).json({ success: false, message: 'No templates found' });
       }
-    } catch (error) {
-      console.error('Error fetching templates:', error);
-    }
-  };
 
-  const handleCommonFieldChange = (e) => {
-    const { name, value } = e.target;
-    setCommonFields(prevFields => ({ ...prevFields, [name]: value }));
-  };
+      const browser = await puppeteer.launch(chromium.executablePath ? {
+        args: [...chromium.args, '--no-sandbox'],
+        executablePath: await chromium.executablePath,
+        headless: chromium.headless,
+      } : {});
 
-  const handleTemplateSelection = (e) => {
-    const templateId = e.target.value;
-    setSelectedTemplates(prevSelected => 
-      e.target.checked
-        ? [...prevSelected, templateId]
-        : prevSelected.filter(id => id !== templateId)
-    );
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch('/api/generate-policies', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          templateIds: selectedTemplates,
-          commonFields,
-        }),
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      if (data.success) {
-        data.policies.forEach(policy => {
-          const pdfBlob = base64ToBlob(policy.pdf, 'application/pdf');
-          const url = URL.createObjectURL(pdfBlob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `${policy.name}.pdf`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
+      const generatedPolicies = await Promise.all(templates.map(async (template) => {
+        let content = template.content;
+        
+        // Replace common fields
+        Object.entries(commonFields).forEach(([key, value]) => {
+          content = content.replace(new RegExp(`{{${key}}}`, 'g'), value || '');
         });
-      } else {
-        throw new Error(data.message || 'Failed to generate policies');
-      }
+
+        // Generate unique fields
+        const uniqueFields = {
+          policy_number: generatePolicyNumber(),
+          effective_date: new Date().toISOString().split('T')[0],
+          date_issued: new Date().toISOString().split('T')[0],
+          date_reviewed: new Date().toISOString().split('T')[0],
+          updated_date: new Date().toISOString().split('T')[0],
+        };
+
+        Object.entries(uniqueFields).forEach(([key, value]) => {
+          content = content.replace(new RegExp(`{{${key}}}`, 'g'), value);
+        });
+
+        const page = await browser.newPage();
+        await page.setContent(content, { waitUntil: 'networkidle0' });
+        const pdf = await page.pdf({ 
+          format: 'A4', 
+          printBackground: true,
+          margin: { top: '1cm', right: '1cm', bottom: '1cm', left: '1cm' }
+        });
+        await page.close();
+
+        return {
+          name: template.name,
+          pdf: pdf.toString('base64'),
+        };
+      }));
+
+      await browser.close();
+
+      res.status(200).json({ success: true, policies: generatedPolicies });
     } catch (error) {
       console.error('Error generating policies:', error);
-      // You might want to add some user-facing error handling here
+      res.status(500).json({ success: false, message: 'Error generating policies', error: error.message });
     }
-  };
+  } else {
+    res.status(405).json({ success: false, message: 'Method not allowed' });
+  }
+}
 
-  const base64ToBlob = (base64, type = 'application/octet-stream') => {
-    const binStr = atob(base64);
-    const len = binStr.length;
-    const arr = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      arr[i] = binStr.charCodeAt(i);
-    }
-    return new Blob([arr], { type: type });
-  };
-  
-  return (
-    <div>
-      <h1>Generate Policies</h1>
-      <Link href="/">
-        <a>Back to Home</a>
-      </Link>
-      <form onSubmit={handleSubmit}>
-        <h2>Common Fields</h2>
-        {Object.entries(commonFields).map(([name, value]) => (
-          <div key={name}>
-            <label htmlFor={name}>{name.replace(/_/g, ' ')}</label>
-            <input
-              type="text"
-              id={name}
-              name={name}
-              value={value}
-              onChange={handleCommonFieldChange}
-            />
-          </div>
-        ))}
-        <h2>Select Policies to Generate</h2>
-        {templates.map((template) => (
-          <div key={template._id}>
-            <input
-              type="checkbox"
-              id={template._id}
-              value={template._id}
-              onChange={handleTemplateSelection}
-            />
-            <label htmlFor={template._id}>{template.name}</label>
-          </div>
-        ))}
-        <button type="submit">Generate Selected Policies</button>
-      </form>
-    </div>
-  );
+function generatePolicyNumber() {
+  return 'POL-' + Math.random().toString(36).substr(2, 9).toUpperCase();
 }
