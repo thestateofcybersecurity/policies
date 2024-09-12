@@ -1,13 +1,11 @@
 import { connectToDatabase } from '../../utils/mongodb';
 import PolicyTemplate from '../../models/PolicyTemplate';
+import { Document, Packer, Paragraph, TextRun } from 'docx';
 
 export default async function handler(req, res) {
-  console.log('Received request:', req.method, req.url);
-  
   if (req.method === 'POST') {
     try {
       await connectToDatabase();
-      console.log('Connected to database');
       
       const { templateIds, commonFields } = req.body;
       
@@ -21,7 +19,7 @@ export default async function handler(req, res) {
         return res.status(404).json({ success: false, message: 'No templates found' });
       }
 
-      const generatedPolicies = templates.map((template) => {
+      const generatedPolicies = await Promise.all(templates.map(async (template) => {
         let content = template.content;
         
         // Replace common fields
@@ -39,20 +37,33 @@ export default async function handler(req, res) {
         content = content.replace(/{{date_reviewed}}/g, effectiveDate);
         content = content.replace(/{{updated_date}}/g, effectiveDate);
 
+        // Create docx document
+        const doc = new Document({
+          sections: [{
+            properties: {},
+            children: [
+              new Paragraph({
+                children: [new TextRun(content)],
+              }),
+            ],
+          }],
+        });
+
+        // Generate buffer
+        const buffer = await Packer.toBuffer(doc);
+
         return {
           name: template.name,
-          content: content,
+          content: buffer.toString('base64'),
         };
-      });
+      }));
 
-      console.log('Policies generated successfully:', generatedPolicies);
       res.status(200).json({ success: true, message: 'Policies generated successfully', policies: generatedPolicies });
     } catch (error) {
       console.error('Error generating policies:', error);
       res.status(500).json({ success: false, message: 'Internal server error' });
     }
   } else {
-    console.log('Method not allowed');
     res.status(405).json({ success: false, message: 'Method not allowed' });
   }
 }
