@@ -1,8 +1,6 @@
-// pages/index.js
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClipboard, faCog } from '@fortawesome/free-solid-svg-icons';
-import '../styles/policy-styles.css';
 
 export default function Home() {
   return (
