@@ -22,16 +22,23 @@ async function dbConnect() {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       bufferCommands: false,
-      serverSelectionTimeoutMS: 20000, // Increase timeout to 20 seconds
-      socketTimeoutMS: 45000, // Increase socket timeout to 45 seconds
+      serverSelectionTimeoutMS: 20000,
+      socketTimeoutMS: 45000,
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+      console.log('Connected to MongoDB');
       return mongoose;
     });
   }
 
-  cached.conn = await cached.promise;
+  try {
+    cached.conn = await cached.promise;
+  } catch (e) {
+    cached.promise = null;
+    throw e;
+  }
+
   return cached.conn;
 }
 
