@@ -1,6 +1,7 @@
 import { connectToDatabase } from '../../utils/dbConnect';
 import PolicyTemplate from '../../models/PolicyTemplate';
 import HTMLtoDOCX from 'html-to-docx';
+import policyFields from '../../utils/policyFields';
 
 export const config = {
   api: {
@@ -16,13 +17,17 @@ export default async function handler(req, res) {
     try {
       await connectToDatabase();
       
-      const { templateIds, commonFields } = req.body;
+      const { templateIds, commonFields, category } = req.body;
       
       if (!templateIds || !Array.isArray(templateIds) || templateIds.length === 0) {
         return res.status(400).json({ success: false, message: 'Invalid or missing templateIds' });
       }
 
-      const templates = await PolicyTemplate.find({ _id: { $in: templateIds } });
+      if (!category || !policyFields[category]) {
+        return res.status(400).json({ success: false, message: 'Invalid or missing category' });
+      }
+
+      const templates = await PolicyTemplate.find({ _id: { $in: templateIds }, category });
 
       if (templates.length === 0) {
         return res.status(404).json({ success: false, message: 'No templates found' });
@@ -37,8 +42,9 @@ export default async function handler(req, res) {
           let content = template.content;
           
           // Replace common fields
-          Object.entries(commonFields).forEach(([key, value]) => {
-            content = content.replace(new RegExp(`{{${key}}}`, 'g'), value || '');
+          Object.entries(policyFields[category]).forEach(([key, { displayName }]) => {
+            const value = commonFields[key] || '';
+            content = content.replace(new RegExp(`{{${key}}}`, 'g'), value);
           });
 
           const policyNumber = generatePolicyNumber();
