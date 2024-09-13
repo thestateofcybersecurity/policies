@@ -2,7 +2,7 @@
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css'; // Import the CSS for icons
 config.autoAddCss = false; // Prevent Font Awesome from adding its CSS automatically
-import '../styles/policy-styles.css';
+import '../styles/globals.css'
 import Head from 'next/head';
 
 function MyApp({ Component, pageProps }) {
