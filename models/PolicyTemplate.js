@@ -4,8 +4,10 @@ import mongoose from 'mongoose';
 const PolicyTemplateSchema = new mongoose.Schema({
   name: { type: String, required: true },
   content: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
-});
+  type: { type: String, enum: ['html', 'text'], default: 'html' },
+  category: { type: String, enum: ['NIST CSF', 'ISO 27001'], required: true }
+}, { timestamps: true });
 
-export default mongoose.models.PolicyTemplate || mongoose.model('PolicyTemplate', PolicyTemplateSchema);
+const PolicyTemplate = mongoose.models.PolicyTemplate || mongoose.model('PolicyTemplate', PolicyTemplateSchema);
+
+export default PolicyTemplate;
