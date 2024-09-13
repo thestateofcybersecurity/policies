@@ -38,13 +38,16 @@ export default async function handler(req, res) {
 
       for (let i = 0; i < templates.length; i += batchSize) {
         const batch = templates.slice(i, i + batchSize);
-        const batchResults = await Promise.all(batch.map(async (template) => {
+        const batchResults = await Promise.all(batch.map(async (template, index) => {
           let content = template.content;
           
-          // Replace common fields
-          Object.entries(policyFields[category]).forEach(([key, { displayName }]) => {
-            const value = commonFields[key] || '';
-            content = content.replace(new RegExp(`{{${key}}}`, 'g'), value);
+          // Autofill logic for ISO placeholders
+          const autofilledFields = autofillISOFields(commonFields, template, index + 1, templates.length);
+          
+          // Replace common fields and autofilled fields
+          Object.entries({ ...policyFields[category], ...autofilledFields }).forEach(([key, value]) => {
+            const fieldValue = (typeof value === 'object' ? value.displayName : value) || '';
+            content = content.replace(new RegExp(`{{${key}}}`, 'g'), fieldValue);
           });
 
           const policyNumber = generatePolicyNumber();
@@ -53,9 +56,6 @@ export default async function handler(req, res) {
           // Generate unique fields
           content = content.replace(/{{policy_number}}/g, policyNumber);
           content = content.replace(/{{effective_date}}/g, effectiveDate);
-          content = content.replace(/{{date_issued}}/g, effectiveDate);
-          content = content.replace(/{{date_reviewed}}/g, effectiveDate);
-          content = content.replace(/{{updated_date}}/g, effectiveDate);
 
           // Convert HTML to DOCX
           const docxBuffer = await HTMLtoDOCX(content, null, {
@@ -85,4 +85,27 @@ export default async function handler(req, res) {
 
 function generatePolicyNumber() {
   return 'POL-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+}
+
+function autofillISOFields(commonFields, template, currentIndex, totalPolicies) {
+  const today = new Date().toISOString().split('T')[0];
+  const orgNameAcronym = getAcronym(commonFields.organization_name || '');
+  const policyNameAcronym = getAcronym(template.name);
+  const scalingNumber = String(currentIndex).padStart(3, '0');
+
+  return {
+    document_reference: `${orgNameAcronym}-${policyNameAcronym}-${scalingNumber}`,
+    issue_number: '1.0',
+    issue_date: today,
+    date_of_issue: today,
+    change_description: 'Initial Creation of Policy'
+  };
+}
+
+function getAcronym(str) {
+  return str
+    .split(/\s+/)
+    .map(word => word[0])
+    .join('')
+    .toUpperCase();
 }
