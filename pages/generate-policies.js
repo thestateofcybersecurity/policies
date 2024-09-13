@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDownload, faSync, faCheck } from '@fortawesome/free-solid-svg-icons';
 import policyFields from '../utils/policyFields';
-import '../styles/policy-styles.css';
 
 export default function GeneratePolicies() {
   const [templates, setTemplates] = useState([]);
@@ -165,7 +166,9 @@ export default function GeneratePolicies() {
             checked={selectedTemplates.length === filteredTemplates.length}
             onChange={handleSelectAll}
           />
-          <label htmlFor="selectAll">Select All</label>
+          <label htmlFor="selectAll">
+            <FontAwesomeIcon icon={faCheck} /> Select All
+          </label>
         </div>
         {filteredTemplates.map((template) => (
           <div key={template._id}>
@@ -179,17 +182,24 @@ export default function GeneratePolicies() {
             <label htmlFor={template._id}>{template.name}</label>
           </div>
         ))}
-        <button type="submit">Generate Selected Policies</button>
+        <button type="submit">
+          <FontAwesomeIcon icon={faSync} /> Generate Selected Policies
+        </button>
       </form>
       {error && <div className="error">{error}</div>}
       {generatedPolicies.length > 0 && (
         <div>
           <h2>Generated Policies</h2>
-          <button onClick={downloadAllPolicies}>Download All Policies</button>
+          <button onClick={downloadAllPolicies}>
+            <FontAwesomeIcon icon={faDownload} /> Download All Policies
+          </button>
           <ul>
             {generatedPolicies.map((policy, index) => (
               <li key={index}>
-                {policy.name} <button onClick={() => downloadPolicy(policy)}>Download DOCX</button>
+                {policy.name} 
+                <button onClick={() => downloadPolicy(policy)}>
+                  <FontAwesomeIcon icon={faDownload} /> Download DOCX
+                </button>
               </li>
             ))}
           </ul>
