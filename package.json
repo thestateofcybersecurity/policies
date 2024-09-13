@@ -17,9 +17,9 @@
     "mongoose": "^8.6.1",
     "chrome-aws-lambda": "^10.1.0",
     "puppeteer-core": "^10.1.0",
-    "@fortawesome/fontawesome-svg-core": "^6.2.0",  // Add this line for Font Awesome core
-    "@fortawesome/free-solid-svg-icons": "^6.2.0",  // Add this line for solid icons
-    "@fortawesome/react-fontawesome": "^0.2.0"      // Add this line for Font Awesome React
+    "@fortawesome/fontawesome-svg-core": "^6.2.0", 
+    "@fortawesome/free-solid-svg-icons": "^6.2.0",  
+    "@fortawesome/react-fontawesome": "^0.2.0"      
   },
   "devDependencies": {
     "@types/react": "^17.0.0"
