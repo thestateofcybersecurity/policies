@@ -141,7 +141,6 @@ const filteredTemplates = selectedCategory === 'all'
         ))}
         <h2>Select Policy Category</h2>
         <select value={selectedCategory} onChange={handleCategoryChange}>
-          <option value="all">All Categories</option>
           <option value="NIST CSF">NIST CSF</option>
           <option value="ISO 27001">ISO 27001</option>
         </select>
