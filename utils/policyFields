@@ -1,0 +1,100 @@
+const policyFields = {
+  'NIST CSF': {
+    entity_name: {
+      displayName: "Entity Name",
+      explanation: "The full legal name of your organization"
+    },
+    CISO_equivalent_title: {
+      displayName: "CISO Equivalent Title",
+      explanation: "The title of the person responsible for information security (e.g., Chief Information Security Officer)"
+    },
+    CIO_equivalent_title: {
+      displayName: "CIO Equivalent Title",
+      explanation: "The title of the person responsible for information technology (e.g., Chief Information Officer)"
+    },
+    responsible_department_name: {
+      displayName: "Responsible Department Name",
+      explanation: "The name of the department primarily responsible for implementing this policy"
+    },
+    issuer_name: {
+      displayName: "Issuer Name",
+      explanation: "The name of the person or entity issuing this policy"
+    },
+    owner_name: {
+      displayName: "Owner Name",
+      explanation: "The name of the person or entity who owns and is ultimately responsible for this policy"
+    },
+    entity_defined_contact_info: {
+      displayName: "Entity Defined Contact Info",
+      explanation: "Contact information for inquiries related to this policy"
+    }
+  },
+  'ISO 27001': {
+    document_reference: {
+      displayName: "Document Reference",
+      explanation: "A unique identifier for this policy document"
+    },
+    issue_number: {
+      displayName: "Issue Number",
+      explanation: "The version number of this policy"
+    },
+    issue_date: {
+      displayName: "Issue Date",
+      explanation: "The date this policy was issued"
+    },
+    organization_name: {
+      displayName: "Organization Name",
+      explanation: "The full legal name of your organization"
+    },
+    information_security_officer: {
+      displayName: "Information Security Officer",
+      explanation: "The name or title of the person responsible for information security"
+    },
+    cto_title: {
+      displayName: "CTO Title",
+      explanation: "The title of the Chief Technology Officer or equivalent"
+    },
+    owner_title: {
+      displayName: "Owner Title",
+      explanation: "The title of the person who owns and is ultimately responsible for this policy"
+    },
+    date_of_issue: {
+      displayName: "Date of Issue",
+      explanation: "The date this policy was officially issued"
+    },
+    approval_authority: {
+      displayName: "Approval Authority",
+      explanation: "The name or title of the person or body that approved this policy"
+    },
+    change_description: {
+      displayName: "Change Description",
+      explanation: "A brief description of changes made in this version of the policy"
+    },
+    information_security_manager_title: {
+      displayName: "Information Security Manager Title",
+      explanation: "The title of the person managing information security"
+    },
+    it_department_title: {
+      displayName: "IT Department Title",
+      explanation: "The official name of your IT department"
+    },
+    security_team_title: {
+      displayName: "Security Team Title",
+      explanation: "The official name of your security team"
+    },
+    unsuccessful_login_attempts: {
+      displayName: "Unsuccessful Login Attempts",
+      explanation: "The number of unsuccessful login attempts allowed before an account is locked"
+    },
+    system_manager_title: {
+      displayName: "System Manager Title",
+      explanation: "The title of the person responsible for system management"
+    },
+    it_manager_title: {
+      displayName: "IT Manager Title",
+      explanation: "The title of the IT Manager or equivalent"
+    }
+  }
+};
+
+export default policyFields;
