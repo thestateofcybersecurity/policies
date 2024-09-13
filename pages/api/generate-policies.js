@@ -33,6 +33,14 @@ export default async function handler(req, res) {
         return res.status(404).json({ success: false, message: 'No templates found' });
       }
 
+      // Auto-fill CIS IG1 specific fields
+      const updatedCommonFields = { ...commonFields };
+      if (category === 'CIS IG1') {
+        updatedCommonFields.version = '1.0';
+        updatedCommonFields.revision_date = new Date().toISOString().split('T')[0]; // Today's date in YYYY-MM-DD format
+        updatedCommonFields.revision_description = 'Initial document creation';
+      }
+      
       const batchSize = 5; // Adjust this based on your needs
       const generatedPolicies = [];
 
