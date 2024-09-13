@@ -30,9 +30,19 @@ h3 {
 }
 
 nav a {
-    color: #00d1b2;
-    text-decoration: none;
-    padding: 10px;
+  color: #00d1b2;
+  text-decoration: none;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+}
+
+nav a svg {
+  margin-right: 10px; /* Add space between icon and text */
+}
+
+button svg {
+  margin-right: 5px; /* Add space between button icons and text */
 }
 
 nav a:hover {
