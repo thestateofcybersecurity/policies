@@ -107,6 +107,7 @@ export default function ManageTemplates() {
           >
             <option value="NIST CSF">NIST CSF</option>
             <option value="ISO 27001">ISO 27001</option>
+                <option value="CIS IG1">CIS IG1</option>
           </select>
         </div>
         <div className="mb-4">
