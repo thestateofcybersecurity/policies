@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDownload, faSync, faCheck, faArrowLeft } from '@fortawesome/free-solid-svg-icons';lid-svg-icons';
+import { faDownload, faSync, faCheck, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import policyFields from '../utils/policyFields';
 
 export default function GeneratePolicies() {
