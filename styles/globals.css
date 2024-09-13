@@ -1,87 +1,68 @@
-/* styles/policy-styles.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: #1a1a1a;
-    color: #e0e0e0;
-    line-height: 1.6;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px;
+    @apply bg-gray-900 text-gray-200 leading-relaxed max-w-4xl mx-auto p-5;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    color: #00d1b2;
-    margin-top: 1.5em;
-    margin-bottom: 0.5em;
+    @apply text-teal-400 mt-6 mb-2;
 }
 
 h1 {
-    font-size: 28px;
-    border-bottom: 2px solid #00d1b2;
-    padding-bottom: 10px;
+    @apply text-3xl border-b-2 border-teal-400 pb-2;
 }
 
 h2 {
-    font-size: 24px;
+    @apply text-2xl;
 }
 
 h3 {
-    font-size: 20px;
+    @apply text-xl;
 }
 
-nav a {
-  color: #00d1b2;
-  text-decoration: none;
-  padding: 10px;
-  display: flex;
-  align-items: center;
+nav a, button, .btn {
+    @apply bg-teal-600 text-white py-2 px-4 rounded-md border border-teal-500 inline-flex items-center transition-colors duration-200;
 }
 
-nav a svg {
-  margin-right: 10px; /* Add space between icon and text */
+nav a:hover, button:hover, .btn:hover {
+    @apply bg-teal-700;
 }
 
-button svg {
-  margin-right: 5px; /* Add space between button icons and text */
-}
-
-nav a:hover {
-    background-color: #00a896;
-    color: #fff;
+nav a svg, button svg {
+    @apply mr-2;
 }
 
 table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-bottom: 1em;
-    background-color: #2c2c2c;
+    @apply w-full mb-4 bg-gray-800;
 }
 
 th, td {
-    border: 1px solid #444;
-    padding: 10px;
-    text-align: left;
-    color: #e0e0e0;
+    @apply border border-gray-700 p-2 text-left;
 }
 
 th {
-    background-color: #333;
-    font-weight: bold;
+    @apply bg-gray-700 font-bold;
 }
 
-button {
-    background-color: #00d1b2;
-    border: none;
-    color: white;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 16px;
+input[type="text"], input[type="number"], textarea, select {
+    @apply bg-gray-800 border border-gray-700 rounded-md p-2 w-full mb-2 text-gray-200;
 }
 
-button:hover {
-    background-color: #00a896;
+input[type="checkbox"] {
+    @apply mr-2;
+}
+
+label {
+    @apply block mb-1 font-medium;
+}
+
+.field-description {
+    @apply text-sm text-gray-400 mb-4;
+}
+
+.policy-field {
+    @apply mb-6 p-4 bg-gray-800 rounded-md border border-gray-700;
 }
