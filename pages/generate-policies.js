@@ -18,6 +18,7 @@ export default function GeneratePolicies() {
   const [error, setError] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   useEffect(() => {
     fetchTemplates();
@@ -52,15 +53,23 @@ export default function GeneratePolicies() {
     );
   };
 
+  const handleCategoryChange = (e) => {
+    setSelectedCategory(e.target.value);
+    setSelectedTemplates([]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setGeneratedPolicies([]);
+    setIsGenerating(true);
+    setProgress(0);
+
     try {
       const response = await fetch('/api/generate-policies', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ templateIds: selectedTemplates, commonFields }),
+        body: JSON.stringify({ templateIds: selectedTemplates, commonFields, category: selectedCategory }),
       });
       
       if (!response.ok) {
@@ -77,6 +86,9 @@ export default function GeneratePolicies() {
     } catch (error) {
       console.error('Error generating policies:', error);
       setError('Failed to generate policies. Please try again.');
+    } finally {
+      setIsGenerating(false);
+      setProgress(100);
     }
   };
 
@@ -104,6 +116,10 @@ export default function GeneratePolicies() {
     document.body.removeChild(link);
   };
 
+const filteredTemplates = selectedCategory === 'all' 
+    ? templates 
+    : templates.filter(template => template.category === selectedCategory);
+  
   return (
     <div>
       <h1>Generate Policies</h1>
@@ -121,16 +137,23 @@ export default function GeneratePolicies() {
             />
           </div>
         ))}
+        <h2>Select Policy Category</h2>
+        <select value={selectedCategory} onChange={handleCategoryChange}>
+          <option value="all">All Categories</option>
+          <option value="NIST CSF">NIST CSF</option>
+          <option value="ISO 27001">ISO 27001</option>
+        </select>
         <h2>Select Policies to Generate</h2>
-        {templates.map((template) => (
+        {filteredTemplates.map((template) => (
           <div key={template._id}>
             <input
               type="checkbox"
               id={template._id}
               value={template._id}
               onChange={handleTemplateSelection}
+              checked={selectedTemplates.includes(template._id)}
             />
-            <label htmlFor={template._id}>{template.name}</label>
+            <label htmlFor={template._id}>{template.name} ({template.category})</label>
           </div>
         ))}
         <button type="submit">Generate Selected Policies</button>
