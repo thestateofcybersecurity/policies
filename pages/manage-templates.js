@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import '../styles/policy-styles.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrash, faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 export default function ManageTemplates() {
   const [templates, setTemplates] = useState([]);
@@ -62,7 +63,7 @@ export default function ManageTemplates() {
     setEditingTemplate(null);
   };
 
-  return (
+ return (
     <div>
       <h1>Manage Templates</h1>
       <Link href="/">
@@ -101,16 +102,26 @@ export default function ManageTemplates() {
           placeholder="Template Content (HTML or Plain Text)"
           required
         />
-        <button type="submit">{editingTemplate ? 'Update Template' : 'Create Template'}</button>
-        {editingTemplate && <button type="button" onClick={cancelEditing}>Cancel Editing</button>}
+        <button type="submit">
+          <FontAwesomeIcon icon={faSave} /> {editingTemplate ? 'Update Template' : 'Create Template'}
+        </button>
+        {editingTemplate && (
+          <button type="button" onClick={cancelEditing}>
+            <FontAwesomeIcon icon={faTimes} /> Cancel Editing
+          </button>
+        )}
       </form>
       <h2>Existing Templates</h2>
       <ul>
         {templates.map((template) => (
           <li key={template._id}>
             {template.name} ({template.category})
-            <button onClick={() => startEditing(template)}>Edit</button>
-            <button onClick={() => deleteTemplate(template._id)}>Delete</button>
+            <button onClick={() => startEditing(template)}>
+              <FontAwesomeIcon icon={faEdit} /> Edit
+            </button>
+            <button onClick={() => deleteTemplate(template._id)}>
+              <FontAwesomeIcon icon={faTrash} /> Delete
+            </button>
           </li>
         ))}
       </ul>
