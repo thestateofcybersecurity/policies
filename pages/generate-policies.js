@@ -1,28 +1,30 @@
-// pages/generate-policies.js
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import policyFields from '../utils/policyFields';
 
 export default function GeneratePolicies() {
   const [templates, setTemplates] = useState([]);
   const [selectedTemplates, setSelectedTemplates] = useState([]);
-  const [commonFields, setCommonFields] = useState({
-    entity_name: '',
-    CISO_equivalent_title: '',
-    CIO_equivalent_title: '',
-    responsible_department_name: '',
-    issuer_name: '',
-    owner_name: '',
-    entity_defined_contact_info: '',
-  });
+  const [commonFields, setCommonFields] = useState({});
   const [generatedPolicies, setGeneratedPolicies] = useState([]);
   const [error, setError] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('NIST CSF');
 
   useEffect(() => {
     fetchTemplates();
   }, []);
+
+  useEffect(() => {
+    // Initialize commonFields with empty strings for the selected category
+    setCommonFields(
+      Object.keys(policyFields[selectedCategory]).reduce((acc, field) => {
+        acc[field] = '';
+        return acc;
+      }, {})
+    );
+  }, [selectedCategory]);
 
   const fetchTemplates = async () => {
     try {
