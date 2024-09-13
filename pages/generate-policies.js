@@ -24,6 +24,7 @@ export default function GeneratePolicies() {
         return acc;
       }, {})
     );
+    setSelectedTemplates([]); // Clear selected templates when category changes
   }, [selectedCategory]);
 
   const fetchTemplates = async () => {
@@ -55,9 +56,16 @@ export default function GeneratePolicies() {
     );
   };
 
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      setSelectedTemplates(filteredTemplates.map(template => template._id));
+    } else {
+      setSelectedTemplates([]);
+    }
+  };
+
   const handleCategoryChange = (e) => {
     setSelectedCategory(e.target.value);
-    setSelectedTemplates([]);
   };
 
   const handleSubmit = async (e) => {
@@ -118,25 +126,29 @@ export default function GeneratePolicies() {
     document.body.removeChild(link);
   };
 
-const filteredTemplates = selectedCategory === 'all' 
-    ? templates 
-    : templates.filter(template => template.category === selectedCategory);
+  const downloadAllPolicies = () => {
+    generatedPolicies.forEach(policy => downloadPolicy(policy));
+  };
+
+  const filteredTemplates = templates.filter(template => template.category === selectedCategory);
   
   return (
     <div>
       <h1>Generate Policies</h1>
       <form onSubmit={handleSubmit}>
         <h2>Common Fields</h2>
-        {Object.entries(commonFields).map(([name, value]) => (
+        {Object.entries(policyFields[selectedCategory]).map(([name, { displayName, explanation }]) => (
           <div key={name}>
-            <label htmlFor={name}>{name.replace(/_/g, ' ')}</label>
+            <label htmlFor={name}>{displayName}</label>
             <input
               type="text"
               id={name}
               name={name}
-              value={value}
+              value={commonFields[name] || ''}
               onChange={handleCommonFieldChange}
+              placeholder={explanation}
             />
+            <p><small>{explanation}</small></p>
           </div>
         ))}
         <h2>Select Policy Category</h2>
@@ -145,6 +157,15 @@ const filteredTemplates = selectedCategory === 'all'
           <option value="ISO 27001">ISO 27001</option>
         </select>
         <h2>Select Policies to Generate</h2>
+        <div>
+          <input
+            type="checkbox"
+            id="selectAll"
+            checked={selectedTemplates.length === filteredTemplates.length}
+            onChange={handleSelectAll}
+          />
+          <label htmlFor="selectAll">Select All</label>
+        </div>
         {filteredTemplates.map((template) => (
           <div key={template._id}>
             <input
@@ -154,7 +175,7 @@ const filteredTemplates = selectedCategory === 'all'
               onChange={handleTemplateSelection}
               checked={selectedTemplates.includes(template._id)}
             />
-            <label htmlFor={template._id}>{template.name} ({template.category})</label>
+            <label htmlFor={template._id}>{template.name}</label>
           </div>
         ))}
         <button type="submit">Generate Selected Policies</button>
@@ -163,6 +184,7 @@ const filteredTemplates = selectedCategory === 'all'
       {generatedPolicies.length > 0 && (
         <div>
           <h2>Generated Policies</h2>
+          <button onClick={downloadAllPolicies}>Download All Policies</button>
           <ul>
             {generatedPolicies.map((policy, index) => (
               <li key={index}>
