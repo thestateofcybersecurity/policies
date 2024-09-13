@@ -63,65 +63,88 @@ export default function ManageTemplates() {
     setEditingTemplate(null);
   };
 
- return (
+  return (
     <div>
       <h1>Manage Templates</h1>
       <Link href="/">
-        <a>Back to Policy Generation</a>
+        <a className="btn mb-4">
+          <FontAwesomeIcon icon={faArrowLeft} /> Back to Policy Generation
+        </a>
       </Link>
       <h2>{editingTemplate ? 'Edit Template' : 'Create New Template'}</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          value={editingTemplate ? editingTemplate.name : newTemplate.name}
-          onChange={handleInputChange}
-          placeholder="Template Name"
-          required
-        />
-        <select
-          name="type"
-          value={editingTemplate ? editingTemplate.type : newTemplate.type}
-          onChange={handleInputChange}
-        >
-          <option value="html">HTML</option>
-          <option value="text">Plain Text</option>
-        </select>
-        <select
-          name="category"
-          value={editingTemplate ? editingTemplate.category : newTemplate.category}
-          onChange={handleInputChange}
-        >
-          <option value="NIST CSF">NIST CSF</option>
-          <option value="ISO 27001">ISO 27001</option>
-        </select>
-        <textarea
-          name="content"
-          value={editingTemplate ? editingTemplate.content : newTemplate.content}
-          onChange={handleInputChange}
-          placeholder="Template Content (HTML or Plain Text)"
-          required
-        />
-        <button type="submit">
-          <FontAwesomeIcon icon={faSave} /> {editingTemplate ? 'Update Template' : 'Create Template'}
-        </button>
-        {editingTemplate && (
-          <button type="button" onClick={cancelEditing}>
-            <FontAwesomeIcon icon={faTimes} /> Cancel Editing
+      <form onSubmit={handleSubmit} className="mb-8">
+        <div className="mb-4">
+          <label htmlFor="name">Template Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={editingTemplate ? editingTemplate.name : newTemplate.name}
+            onChange={handleInputChange}
+            placeholder="Template Name"
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="type">Template Type</label>
+          <select
+            id="type"
+            name="type"
+            value={editingTemplate ? editingTemplate.type : newTemplate.type}
+            onChange={handleInputChange}
+          >
+            <option value="html">HTML</option>
+            <option value="text">Plain Text</option>
+          </select>
+        </div>
+        <div className="mb-4">
+          <label htmlFor="category">Template Category</label>
+          <select
+            id="category"
+            name="category"
+            value={editingTemplate ? editingTemplate.category : newTemplate.category}
+            onChange={handleInputChange}
+          >
+            <option value="NIST CSF">NIST CSF</option>
+            <option value="ISO 27001">ISO 27001</option>
+          </select>
+        </div>
+        <div className="mb-4">
+          <label htmlFor="content">Template Content</label>
+          <textarea
+            id="content"
+            name="content"
+            value={editingTemplate ? editingTemplate.content : newTemplate.content}
+            onChange={handleInputChange}
+            placeholder="Template Content (HTML or Plain Text)"
+            required
+            rows="10"
+          />
+        </div>
+        <div className="flex gap-2">
+          <button type="submit" className="btn">
+            <FontAwesomeIcon icon={faSave} /> {editingTemplate ? 'Update Template' : 'Create Template'}
           </button>
-        )}
+          {editingTemplate && (
+            <button type="button" onClick={cancelEditing} className="btn bg-gray-600 hover:bg-gray-700">
+              <FontAwesomeIcon icon={faTimes} /> Cancel Editing
+            </button>
+          )}
+        </div>
       </form>
       <h2>Existing Templates</h2>
-      <ul>
+      <ul className="space-y-2">
         {templates.map((template) => (
-          <li key={template._id}>
-            {template.name} ({template.category})
-            <button onClick={() => startEditing(template)}>
-              <FontAwesomeIcon icon={faEdit} /> Edit
-            </button>
-            <button onClick={() => deleteTemplate(template._id)}>
-              <FontAwesomeIcon icon={faTrash} /> Delete
-            </button>
+          <li key={template._id} className="flex items-center justify-between bg-gray-800 p-4 rounded-md">
+            <span>{template.name} ({template.category})</span>
+            <div className="flex gap-2">
+              <button onClick={() => startEditing(template)} className="btn">
+                <FontAwesomeIcon icon={faEdit} /> Edit
+              </button>
+              <button onClick={() => deleteTemplate(template._id)} className="btn bg-red-600 hover:bg-red-700">
+                <FontAwesomeIcon icon={faTrash} /> Delete
+              </button>
+            </div>
           </li>
         ))}
       </ul>
