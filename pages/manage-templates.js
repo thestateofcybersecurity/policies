@@ -1,10 +1,9 @@
-// pages/manage-templates.js
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function ManageTemplates() {
   const [templates, setTemplates] = useState([]);
-  const [newTemplate, setNewTemplate] = useState({ name: '', content: '', type: 'html' });
+  const [newTemplate, setNewTemplate] = useState({ name: '', content: '', type: 'html', category: 'NIST CSF' });
   const [editingTemplate, setEditingTemplate] = useState(null);
 
   useEffect(() => {
@@ -42,7 +41,7 @@ export default function ManageTemplates() {
 
     if (res.ok) {
       fetchTemplates();
-      setNewTemplate({ name: '', content: '' });
+      setNewTemplate({ name: '', content: '', type: 'html', category: 'NIST CSF' });
       setEditingTemplate(null);
     }
   };
@@ -86,6 +85,14 @@ export default function ManageTemplates() {
           <option value="html">HTML</option>
           <option value="text">Plain Text</option>
         </select>
+        <select
+          name="category"
+          value={editingTemplate ? editingTemplate.category : newTemplate.category}
+          onChange={handleInputChange}
+        >
+          <option value="NIST CSF">NIST CSF</option>
+          <option value="ISO 27001">ISO 27001</option>
+        </select>
         <textarea
           name="content"
           value={editingTemplate ? editingTemplate.content : newTemplate.content}
@@ -100,7 +107,7 @@ export default function ManageTemplates() {
       <ul>
         {templates.map((template) => (
           <li key={template._id}>
-            {template.name}
+            {template.name} ({template.category})
             <button onClick={() => startEditing(template)}>Edit</button>
             <button onClick={() => deleteTemplate(template._id)}>Delete</button>
           </li>
