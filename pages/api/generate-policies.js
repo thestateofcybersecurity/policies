@@ -1,4 +1,4 @@
-import { connectToDatabase } from '../../utils/mongodb';
+import { connectToDatabase } from '../../utils/dbConnect';
 import PolicyTemplate from '../../models/PolicyTemplate';
 import HTMLtoDOCX from 'html-to-docx';
 
