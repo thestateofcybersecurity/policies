@@ -138,7 +138,7 @@ export default function GeneratePolicies() {
     <div>
       <h1>Generate Policies</h1>
       <Link href="/">
-        <a className="btn mb-4">
+        <a className="btn">
           <FontAwesomeIcon icon={faArrowLeft} /> Back to Home
         </a>
       </Link>
@@ -159,54 +159,50 @@ export default function GeneratePolicies() {
           </div>
         ))}
         <h2>Select Policy Category</h2>
-        <div className="mb-4">
-          <select value={selectedCategory} onChange={handleCategoryChange}>
-            <option value="NIST CSF">NIST CSF</option>
-            <option value="ISO 27001">ISO 27001</option>
-          </select>
-        </div>
+        <select value={selectedCategory} onChange={handleCategoryChange}>
+          <option value="NIST CSF">NIST CSF</option>
+          <option value="ISO 27001">ISO 27001</option>
+        </select>
         <h2>Select Policies to Generate</h2>
-        <div className="mb-4">
-          <label className="inline-flex items-center">
+        <div>
+          <label>
             <input
               type="checkbox"
               checked={selectedTemplates.length === filteredTemplates.length}
               onChange={handleSelectAll}
             />
-            <span><FontAwesomeIcon icon={faCheck} className="mr-2" /> Select All</span>
+            <FontAwesomeIcon icon={faCheck} /> Select All
           </label>
         </div>
-        <div className="mb-4 space-y-2">
-          {filteredTemplates.map((template) => (
-            <div key={template._id}>
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  value={template._id}
-                  onChange={handleTemplateSelection}
-                  checked={selectedTemplates.includes(template._id)}
-                />
-                <span>{template.name}</span>
-              </label>
-            </div>
-          ))}
-        </div>
-        <button type="submit" className="btn">
+        {filteredTemplates.map((template) => (
+          <div key={template._id}>
+            <label>
+              <input
+                type="checkbox"
+                value={template._id}
+                onChange={handleTemplateSelection}
+                checked={selectedTemplates.includes(template._id)}
+              />
+              {template.name}
+            </label>
+          </div>
+        ))}
+        <button type="submit">
           <FontAwesomeIcon icon={faSync} /> Generate Selected Policies
         </button>
       </form>
-      {error && <div className="error mt-4 text-red-500">{error}</div>}
+      {error && <div className="error">{error}</div>}
       {generatedPolicies.length > 0 && (
-        <div className="mt-8">
+        <div>
           <h2>Generated Policies</h2>
-          <button onClick={downloadAllPolicies} className="btn mb-4">
+          <button onClick={downloadAllPolicies}>
             <FontAwesomeIcon icon={faDownload} /> Download All Policies
           </button>
-          <ul className="space-y-2">
+          <ul>
             {generatedPolicies.map((policy, index) => (
-              <li key={index} className="flex items-center justify-between bg-gray-800 p-4 rounded-md">
-                <span>{policy.name}</span>
-                <button onClick={() => downloadPolicy(policy)} className="btn">
+              <li key={index}>
+                {policy.name} 
+                <button onClick={() => downloadPolicy(policy)}>
                   <FontAwesomeIcon icon={faDownload} /> Download DOCX
                 </button>
               </li>
@@ -215,9 +211,9 @@ export default function GeneratePolicies() {
         </div>
       )}
       {isGenerating && (
-        <div className="mt-4">
-          <progress value={progress} max={100} className="w-full"></progress>
-          <p className="text-center mt-2">{progress}% complete</p>
+        <div>
+          <progress value={progress} max={100}></progress>
+          <p>{progress}% complete</p>
         </div>
       )}
     </div>
