@@ -74,6 +74,25 @@ const policyFields = {
       displayName: "IT Manager Title",
       explanation: "The title of the IT Manager or equivalent"
     }
+  },
+  'CIS IG1': {
+    exception_date_review: { displayName: 'Exception Review Date', explanation: 'Date of review for exception requests' },
+    service_provider_name: { displayName: 'Service Provider Name', explanation: 'Name of the service provider' },
+    business_unit: { displayName: 'Business Unit', explanation: 'Business unit leveraging the platform' },
+    service_provider_classification: { displayName: 'Service Provider Classification', explanation: 'Classification of the service provider' },
+    service_provider_contact: { displayName: 'Service Provider Contact', explanation: 'Point of contact at the service provider' },
+    enterprise_contact: { displayName: 'Enterprise Contact', explanation: 'Point of contact within the enterprise managing the service provider relationship' },
+    version: { displayName: 'Version', explanation: 'Version of the policy' },
+    revision_date: { displayName: 'Revision Date', explanation: 'Date of the revision' },
+    revision_description: { displayName: 'Revision Description', explanation: 'Description of the revision' },
+    author_name: { displayName: 'Author Name', explanation: 'Name of the person responsible for the revision' },
+    incident_manager_name: { displayName: 'Incident Manager Name', explanation: 'Name of the primary incident manager' },
+    backup_incident_manager_name: { displayName: 'Backup Incident Manager Name', explanation: 'Name of the backup incident manager' },
+    third_party_incident_manager: { displayName: 'Third Party Incident Manager', explanation: 'Name or role of the third party incident manager, if applicable' },
+    incident_contact_information: { displayName: 'Incident Contact Information', explanation: 'Contact information for incident reporting and management' },
+    incident_report_recipients: { displayName: 'Incident Report Recipients', explanation: 'List of individuals or roles who should receive incident reports' },
+    incident_min_info: { displayName: 'Minimum Incident Information', explanation: 'Minimum information required for incident reporting' },
+    incident_report_timeframe: { displayName: 'Incident Report Timeframe', explanation: 'Timeframe within which incidents must be reported' }
   }
 };
 
