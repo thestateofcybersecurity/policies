@@ -137,10 +137,15 @@ export default function GeneratePolicies() {
   return (
     <div>
       <h1>Generate Policies</h1>
+      <Link href="/">
+        <a className="btn mb-4">
+          <FontAwesomeIcon icon={faArrowLeft} /> Back to Home
+        </a>
+      </Link>
       <form onSubmit={handleSubmit}>
         <h2>Common Fields</h2>
         {Object.entries(policyFields[selectedCategory]).map(([name, { displayName, explanation }]) => (
-          <div key={name}>
+          <div key={name} className="policy-field">
             <label htmlFor={name}>{displayName}</label>
             <input
               type="text"
@@ -148,56 +153,60 @@ export default function GeneratePolicies() {
               name={name}
               value={commonFields[name] || ''}
               onChange={handleCommonFieldChange}
-              placeholder={explanation}
+              placeholder={displayName}
             />
-            <p><small>{explanation}</small></p>
+            <p className="field-description">{explanation}</p>
           </div>
         ))}
         <h2>Select Policy Category</h2>
-        <select value={selectedCategory} onChange={handleCategoryChange}>
-          <option value="NIST CSF">NIST CSF</option>
-          <option value="ISO 27001">ISO 27001</option>
-        </select>
-        <h2>Select Policies to Generate</h2>
-        <div>
-          <input
-            type="checkbox"
-            id="selectAll"
-            checked={selectedTemplates.length === filteredTemplates.length}
-            onChange={handleSelectAll}
-          />
-          <label htmlFor="selectAll">
-            <FontAwesomeIcon icon={faCheck} /> Select All
-          </label>
+        <div className="mb-4">
+          <select value={selectedCategory} onChange={handleCategoryChange}>
+            <option value="NIST CSF">NIST CSF</option>
+            <option value="ISO 27001">ISO 27001</option>
+          </select>
         </div>
-        {filteredTemplates.map((template) => (
-          <div key={template._id}>
+        <h2>Select Policies to Generate</h2>
+        <div className="mb-4">
+          <label className="inline-flex items-center">
             <input
               type="checkbox"
-              id={template._id}
-              value={template._id}
-              onChange={handleTemplateSelection}
-              checked={selectedTemplates.includes(template._id)}
+              checked={selectedTemplates.length === filteredTemplates.length}
+              onChange={handleSelectAll}
             />
-            <label htmlFor={template._id}>{template.name}</label>
-          </div>
-        ))}
-        <button type="submit">
+            <span><FontAwesomeIcon icon={faCheck} className="mr-2" /> Select All</span>
+          </label>
+        </div>
+        <div className="mb-4 space-y-2">
+          {filteredTemplates.map((template) => (
+            <div key={template._id}>
+              <label className="inline-flex items-center">
+                <input
+                  type="checkbox"
+                  value={template._id}
+                  onChange={handleTemplateSelection}
+                  checked={selectedTemplates.includes(template._id)}
+                />
+                <span>{template.name}</span>
+              </label>
+            </div>
+          ))}
+        </div>
+        <button type="submit" className="btn">
           <FontAwesomeIcon icon={faSync} /> Generate Selected Policies
         </button>
       </form>
-      {error && <div className="error">{error}</div>}
+      {error && <div className="error mt-4 text-red-500">{error}</div>}
       {generatedPolicies.length > 0 && (
-        <div>
+        <div className="mt-8">
           <h2>Generated Policies</h2>
-          <button onClick={downloadAllPolicies}>
+          <button onClick={downloadAllPolicies} className="btn mb-4">
             <FontAwesomeIcon icon={faDownload} /> Download All Policies
           </button>
-          <ul>
+          <ul className="space-y-2">
             {generatedPolicies.map((policy, index) => (
-              <li key={index}>
-                {policy.name} 
-                <button onClick={() => downloadPolicy(policy)}>
+              <li key={index} className="flex items-center justify-between bg-gray-800 p-4 rounded-md">
+                <span>{policy.name}</span>
+                <button onClick={() => downloadPolicy(policy)} className="btn">
                   <FontAwesomeIcon icon={faDownload} /> Download DOCX
                 </button>
               </li>
@@ -206,9 +215,9 @@ export default function GeneratePolicies() {
         </div>
       )}
       {isGenerating && (
-        <div>
-          <progress value={progress} max={100}></progress>
-          <p>{progress}% complete</p>
+        <div className="mt-4">
+          <progress value={progress} max={100} className="w-full"></progress>
+          <p className="text-center mt-2">{progress}% complete</p>
         </div>
       )}
     </div>
