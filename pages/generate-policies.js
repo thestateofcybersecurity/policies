@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import policyFields from '../utils/policyFields';
+import '../styles/policy-styles.css';
 
 export default function GeneratePolicies() {
   const [templates, setTemplates] = useState([]);
