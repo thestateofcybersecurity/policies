@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import '../styles/policy-styles.css';
 
 export default function ManageTemplates() {
   const [templates, setTemplates] = useState([]);
