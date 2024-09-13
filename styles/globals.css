@@ -1,68 +1,100 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 body {
     font-family: 'Roboto', sans-serif;
-    @apply bg-gray-900 text-gray-200 leading-relaxed max-w-4xl mx-auto p-5;
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+    line-height: 1.6;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    @apply text-teal-400 mt-6 mb-2;
+    color: #00d1b2;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
 }
 
 h1 {
-    @apply text-3xl border-b-2 border-teal-400 pb-2;
+    font-size: 28px;
+    border-bottom: 2px solid #00d1b2;
+    padding-bottom: 10px;
 }
 
 h2 {
-    @apply text-2xl;
+    font-size: 24px;
 }
 
 h3 {
-    @apply text-xl;
+    font-size: 20px;
 }
 
 nav a, button, .btn {
-    @apply bg-teal-600 text-white py-2 px-4 rounded-md border border-teal-500 inline-flex items-center transition-colors duration-200;
+    background-color: #00d1b2;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
 }
 
 nav a:hover, button:hover, .btn:hover {
-    @apply bg-teal-700;
+    background-color: #00a896;
 }
 
 nav a svg, button svg {
-    @apply mr-2;
+    margin-right: 10px;
 }
 
 table {
-    @apply w-full mb-4 bg-gray-800;
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1em;
+    background-color: #2c2c2c;
 }
 
 th, td {
-    @apply border border-gray-700 p-2 text-left;
+    border: 1px solid #444;
+    padding: 10px;
+    text-align: left;
 }
 
 th {
-    @apply bg-gray-700 font-bold;
+    background-color: #333;
+    font-weight: bold;
 }
 
 input[type="text"], input[type="number"], textarea, select {
-    @apply bg-gray-800 border border-gray-700 rounded-md p-2 w-full mb-2 text-gray-200;
+    background-color: #2c2c2c;
+    border: 1px solid #444;
+    color: #e0e0e0;
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 10px;
+    border-radius: 5px;
 }
 
 input[type="checkbox"] {
-    @apply mr-2;
+    margin-right: 10px;
 }
 
 label {
-    @apply block mb-1 font-medium;
+    display: block;
+    margin-bottom: 5px;
 }
 
 .field-description {
-    @apply text-sm text-gray-400 mb-4;
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 10px;
 }
 
 .policy-field {
-    @apply mb-6 p-4 bg-gray-800 rounded-md border border-gray-700;
+    margin-bottom: 20px;
 }
