@@ -42,4 +42,4 @@ export async function connectToDatabase() {
   return cached.conn;
 }
 
-export default dbConnect;
+export default connectToDatabase;
