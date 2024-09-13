@@ -162,6 +162,7 @@ export default function GeneratePolicies() {
         <select value={selectedCategory} onChange={handleCategoryChange}>
           <option value="NIST CSF">NIST CSF</option>
           <option value="ISO 27001">ISO 27001</option>
+          <option value="CIS IG1">CIS IG1</option>
         </select>
         <h2>Select Policies to Generate</h2>
         <div>
