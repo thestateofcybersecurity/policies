@@ -1,5 +1,6 @@
 // pages/index.js
 import Link from 'next/link';
+import '../styles/policy-styles.css';
 
 export default function Home() {
   return (
